@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Currency Converter</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #0d1117;
+      color: #f0f0f0;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 40px;
+    }
+
+    .container {
+      background-color: #161b22;
+      border-radius: 20px;
+      padding: 50px 40px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      color: #ffffff;
+      font-size: 2.5rem;
+      text-shadow: 0 0 10px #8b5cf6;
+      font-weight: 700;
+    }
+
+    .field {
+      display: flex;
+      align-items: center;
+      background-color: #0e1117;
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin: 20px 0;
+    }
+
+    .field input {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 1.6rem;
+      width: 100%;
+      outline: none;
+      padding: 6px 10px;
+    }
+
+    .field select {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 1.6rem;
+      outline: none;
+      cursor: pointer;
+      margin-left: auto;
+      padding: 6px 12px;
+    }
+
+    .field select option {
+      background: #0d1117;
+      color: #fff;
+      font-size: 1.4rem;
+    }
+
+    .flag-img {
+      width: 32px;
+      height: 24px;
+      margin-right: 16px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .swap-field {
+      background-color: #0e1117;
+      border-radius: 16px;
+      padding: 16px;
+      margin: 20px 0;
+      color: #58a6ff;
+      font-weight: 700;
+      font-size: 1.8rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      /* Removed hover effect */
+      /* transition: background-color 0.3s ease; */
+    }
+
+    /* Removed swap-field:hover */
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      background: linear-gradient(135deg, #6d28d9, #8b5cf6);
+      color: white;
+      font-weight: 700;
+      border: none;
+      padding: 18px;
+      font-size: 1.8rem;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      box-shadow: 0 12px 30px rgba(139, 92, 246, 0.6);
+    }
+
+    #result {
+      margin-top: 25px;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #00ff80;
+      min-height: 28px;
+      letter-spacing: 0.03em;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 40px 30px;
+        max-width: 100%;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+      .field input,
+      .field select {
+        font-size: 1.3rem;
+      }
+      .flag-img {
+        width: 28px;
+        height: 20px;
+        margin-right: 12px;
+      }
+      .swap-field {
+        font-size: 1.4rem;
+        padding: 12px;
+      }
+      button {
+        font-size: 1.4rem;
+        padding: 14px;
+      }
+      #result {
+        font-size: 1.3rem;
+        margin-top: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Currency Converter</h1>
+
+    <div class="field">
+      <img id="from-flag" class="flag-img" src="" alt="From Flag" />
+      <input type="number" id="amount" placeholder="Enter amount" />
+      <select id="from-currency"></select>
+    </div>
+
+    <div class="swap-field" onclick="swapCurrencies()">🔁 Swap</div>
+
+    <div class="field">
+      <img id="to-flag" class="flag-img" src="" alt="To Flag" />
+      <select id="to-currency"></select>
+    </div>
+
+    <button onclick="convertCurrency()">Convert</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const currencyList = {
+      USD: "us", EUR: "eu", GBP: "gb", INR: "in",
+      JPY: "jp", AUD: "au", CAD: "ca", CHF: "ch",
+      CNY: "cn", NZD: "nz", RUB: "ru", BRL: "br"
+    };
+
+    const fromCurrency = document.getElementById("from-currency");
+    const toCurrency = document.getElementById("to-currency");
+    const fromFlag = document.getElementById("from-flag");
+    const toFlag = document.getElementById("to-flag");
+    const amount = document.getElementById("amount");
+    const result = document.getElementById("result");
+
+    function loadCurrencies() {
+      for (let code in currencyList) {
+        let option1 = new Option(code, code);
+        let option2 = new Option(code, code);
+        fromCurrency.appendChild(option1);
+        toCurrency.appendChild(option2);
+      }
+      fromCurrency.value = "INR";
+      toCurrency.value = "CHF";
+      updateFlags();
+    }
+
+    function updateFlags() {
+      fromFlag.src = `https://flagcdn.com/32x24/${currencyList[fromCurrency.value].toLowerCase()}.png`;
+      toFlag.src = `https://flagcdn.com/32x24/${currencyList[toCurrency.value].toLowerCase()}.png`;
+    }
+
+    async function convertCurrency() {
+      const amt = parseFloat(amount.value);
+      const from = fromCurrency.value;
+      const to = toCurrency.value;
+
+      if (!amt || amt <= 0) {
+        result.textContent = "Enter a valid amount.";
+        return;
+      }
+
+      result.textContent = "Fetching...";
+      try {
+        const res = await fetch(`https://open.er-api.com/v6/latest/${from}`);
+        const data = await res.json();
+
+        if (data.result === "success") {
+          const rate = data.rates[to];
+          const converted = (amt * rate).toFixed(2);
+          result.textContent = `${amt} ${from} = ${converted} ${to}`;
+        } else {
+          result.textContent = "Error fetching rate.";
+        }
+      } catch {
+        result.textContent = "Conversion failed.";
+      }
+    }
+
+    function swapCurrencies() {
+      const temp = fromCurrency.value;
+      fromCurrency.value = toCurrency.value;
+      toCurrency.value = temp;
+      updateFlags();
+    }
+
+    fromCurrency.addEventListener("change", updateFlags);
+    toCurrency.addEventListener("change", updateFlags);
+
+    loadCurrencies();
+  </script>
+</body>
+</html>
