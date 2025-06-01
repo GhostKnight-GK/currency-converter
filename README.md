@@ -2,6 +2,9 @@
 
 A simple and modern web app to convert amounts between different currencies using live exchange rates. It shows country flags and has a clean dark-themed design for a great user experience.
 
+# Site link - 
+https://ghostknight-gk.github.io/currency-converter/
+
 ## Features
 
 -> Convert currency amounts easily.
